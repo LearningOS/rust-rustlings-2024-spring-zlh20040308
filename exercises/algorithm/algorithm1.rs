@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -35,6 +34,42 @@ impl<T> Default for LinkedList<T> {
     }
 }
 
+impl<T: PartialOrd + Copy> LinkedList<T> {
+    pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self {
+        let mut merged_list = LinkedList::new();
+        let mut current_a = list_a.start;
+        let mut current_b = list_b.start;
+
+        while let (Some(node_ptr_a), Some(node_ptr_b)) = (current_a, current_b) {
+            let node_a = unsafe { &*node_ptr_a.as_ptr() };
+            let node_b = unsafe { &*node_ptr_b.as_ptr() };
+
+            if node_a.val <= node_b.val {
+                merged_list.add(node_a.val);
+                current_a = node_a.next;
+            } else {
+                merged_list.add(node_b.val);
+                current_b = node_b.next;
+            }
+        }
+
+        // Add remaining elements from list_a, if any
+        while let Some(node_ptr) = current_a {
+            let node = unsafe { &*node_ptr.as_ptr() };
+            merged_list.add(node.val);
+            current_a = node.next;
+        }
+
+        // Add remaining elements from list_b, if any
+        while let Some(node_ptr) = current_b {
+            let node = unsafe { &*node_ptr.as_ptr() };
+            merged_list.add(node.val);
+            current_b = node.next;
+        }
+
+        merged_list
+    }
+}
 impl<T> LinkedList<T> {
     pub fn new() -> Self {
         Self {
@@ -69,15 +104,15 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
-	}
+	// pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	// {
+	// 	//TODO
+	// 	Self {
+    //         length: 0,
+    //         start: None,
+    //         end: None,
+    //     }
+	// }
 }
 
 impl<T> Display for LinkedList<T>
