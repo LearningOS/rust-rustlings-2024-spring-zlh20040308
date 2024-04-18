@@ -1,8 +1,7 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -38,10 +37,28 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.count += 1;
+        self.items.push(value);
+        let mut cur_node_index = self.count;
+        let mut cur_node_parent_index = self.parent_idx(cur_node_index);
+        while self.valid_index(cur_node_parent_index) {
+            if (self.comparator)(&self.items[cur_node_index], &self.items[cur_node_parent_index]){
+                self.items.swap(cur_node_index, cur_node_parent_index);
+                cur_node_index = cur_node_parent_index;
+                cur_node_parent_index = self.parent_idx(cur_node_index);
+            }else {
+                break;
+            }
+            
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
         idx / 2
+    }
+
+    fn valid_index(&self, idx: usize) -> bool {
+        idx <= self.count && idx >=1
     }
 
     fn children_present(&self, idx: usize) -> bool {
@@ -58,7 +75,17 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+        if self.valid_index(left) && self.valid_index(right) {
+            if (self.comparator)(&self.items[left], &self.items[right]) {
+                left
+            } else {
+                right
+            }
+        } else {
+            left
+        }
     }
 }
 
@@ -85,7 +112,27 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        if self.count == 0 {
+            return None;
+        }
+        if self.count == 1 {
+            self.count -= 1;
+            return self.items.pop();
+        }
+        self.items.swap(1, self.count);
+        let res = self.items.pop();
+        let mut cur_node_index: usize = 1;
+        self.count -= 1;
+        while self.children_present(cur_node_index) {
+            let smallest = self.smallest_child_idx(cur_node_index);
+            if (self.comparator)(&self.items[cur_node_index], &self.items[smallest]) {
+                break;
+            }else {
+                self.items.swap(cur_node_index, smallest);
+                cur_node_index = smallest;
+            }
+        }
+        res
     }
 }
 
